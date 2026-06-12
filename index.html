@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>2026 월드컵 예측</title>
+<meta name="description" content="2026 월드컵 승무패 · 스코어 · 키플레이어 예측 아카이브" />
+<meta property="og:title" content="2026 월드컵 예측 ⚽" />
+<meta property="og:description" content="조별리그 12개 조 + 32강~결승 토너먼트 픽, 적중률까지 한눈에" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Noto+Sans+KR:wght@400;500;700&family=Oswald:wght@500;700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --pitch: #0c1a12; --card: #142419; --card-2: #1a2c1f;
+    --chalk: rgba(236,244,238,.92); --chalk-dim: rgba(236,244,238,.55);
+    --chalk-faint: rgba(236,244,238,.14);
+    --gold: #e9c46a; --upset: #e26d5c; --fav: #6fbf8e;
+    --display: "Black Han Sans","Noto Sans KR",sans-serif;
+    --body: "Noto Sans KR",sans-serif;
+    --num: "Oswald","Noto Sans KR",sans-serif;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { -webkit-text-size-adjust:100%; }
+  body {
+    background: var(--pitch);
+    background-image: repeating-linear-gradient(90deg, transparent 0 64px, rgba(255,255,255,.018) 64px 128px);
+    color: var(--chalk); font-family: var(--body);
+    min-height:100dvh; max-width:520px; margin:0 auto; padding-bottom:96px;
+  }
+
+  header { padding:24px 20px 16px; border-bottom:2px solid var(--chalk-faint); }
+  .head-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .eyebrow { font-family:var(--num); font-size:11px; letter-spacing:.28em; color:var(--gold); text-transform:uppercase; margin-bottom:6px; }
+  h1 { font-family:var(--display); font-size:clamp(27px,7.5vw,36px); font-weight:400; line-height:1.12; }
+  .owner-line { margin-top:6px; font-size:13px; color:var(--chalk-dim); }
+  .owner-line b { color:var(--chalk); font-weight:700; }
+
+  .auth { flex:0 0 auto; text-align:right; }
+  .btn {
+    font-family:var(--body); font-weight:700; font-size:12.5px;
+    background:var(--card-2); color:var(--chalk);
+    border:1px solid var(--chalk-faint); border-radius:8px;
+    padding:8px 12px; cursor:pointer;
+  }
+  .btn.gold { background:var(--gold); border-color:var(--gold); color:#20180a; }
+  .btn.danger { color:var(--upset); border-color:rgba(226,109,92,.4); }
+  .btn:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
+  .auth-user { font-size:11px; color:var(--chalk-dim); margin-top:6px; word-break:break-all; }
+
+  .banner {
+    margin:12px 20px 0; padding:10px 12px; border-radius:8px;
+    border:1px dashed var(--chalk-faint); background:var(--card);
+    font-size:12px; color:var(--chalk-dim); line-height:1.5;
+  }
+  .banner.hidden { display:none; }
+
+  .scoreboard { margin-top:14px; display:flex; gap:10px; }
+  .sb-cell { flex:1; background:var(--card); border:1px solid var(--chalk-faint); border-radius:10px; padding:10px 12px; }
+  .sb-num { font-family:var(--num); font-size:25px; font-weight:700; line-height:1; font-variant-numeric:tabular-nums; }
+  .sb-num.gold { color:var(--gold); }
+  .sb-label { margin-top:5px; font-size:11px; color:var(--chalk-dim); }
+
+  /* 상단 탭: 조별리그 / 토너먼트 */
+  .stage-tabs { display:flex; gap:8px; padding:14px 20px 0; }
+  .stage-tab {
+    flex:1; font-family:var(--display); font-size:15px; font-weight:400;
+    padding:10px 0; border-radius:10px; border:1px solid var(--chalk-faint);
+    background:var(--card); color:var(--chalk-dim); cursor:pointer;
+  }
+  .stage-tab[aria-pressed="true"] { background:var(--card-2); color:var(--gold); border-color:var(--gold); }
+
+  nav.groups {
+    position:sticky; top:0; z-index:20;
+    background:linear-gradient(var(--pitch) 82%, transparent);
+    padding:12px 20px 10px; display:flex; gap:8px; overflow-x:auto; scrollbar-width:none;
+  }
+  nav.groups::-webkit-scrollbar { display:none; }
+  .chip {
+    flex:0 0 auto; font-family:var(--num); font-weight:700; font-size:13.5px; letter-spacing:.06em;
+    padding:8px 14px; border-radius:999px; border:1px solid var(--chalk-faint);
+    background:var(--card); color:var(--chalk-dim); cursor:pointer; transition:all .15s ease;
+  }
+  .chip[aria-pressed="true"] { background:var(--gold); border-color:var(--gold); color:#20180a; }
+
+  main { padding:4px 20px 0; }
+  section { margin-top:24px; }
+  .sec-head { display:flex; align-items:baseline; gap:10px; margin-bottom:12px; border-bottom:1px dashed var(--chalk-faint); padding-bottom:8px; }
+  .sec-title { font-family:var(--display); font-weight:400; font-size:18px; }
+  .sec-sub { font-size:11.5px; color:var(--chalk-dim); }
+
+  /* 순위 */
+  .standings { display:flex; flex-direction:column; gap:6px; }
+  .stand-row {
+    display:grid; grid-template-columns:28px 1fr auto; align-items:center; gap:10px;
+    background:var(--card); border:1px solid var(--chalk-faint); border-radius:10px; padding:10px 13px;
+  }
+  .stand-row.q { border-left:3px solid var(--fav); }
+  .stand-row.q3 { border-left:3px solid rgba(111,191,142,.35); }
+  .rank { font-family:var(--num); font-weight:700; font-size:16px; color:var(--chalk-dim); }
+  .stand-team { font-weight:700; font-size:15px; }
+  .stand-team .flag { margin-right:7px; }
+  .stand-rec { font-family:var(--num); font-size:13px; color:var(--chalk-dim); }
+  .stand-note { margin-top:8px; font-size:11.5px; color:var(--chalk-dim); }
+  .stand-note i { display:inline-block; width:8px; height:8px; border-radius:2px; background:var(--fav); margin-right:6px; font-style:normal; }
+  .stand-note .half { background:rgba(111,191,142,.35); }
+
+  /* 경기 카드 */
+  .matches { display:flex; flex-direction:column; gap:10px; }
+  .match { position:relative; background:var(--card); border:1px solid var(--chalk-faint); border-radius:12px; padding:13px 14px 12px; overflow:hidden; }
+  .match-top { display:flex; justify-content:space-between; align-items:center; margin-bottom:9px; min-height:18px; }
+  .badges { display:flex; gap:6px; flex-wrap:wrap; }
+  .badge { font-size:10.5px; font-weight:700; letter-spacing:.05em; padding:3px 8px; border-radius:4px; }
+  .badge.fav { background:rgba(111,191,142,.15); color:var(--fav); }
+  .badge.upset { background:rgba(226,109,92,.15); color:var(--upset); }
+  .badge.pick { background:rgba(233,196,106,.12); color:var(--gold); }
+  .badge.no { background:var(--card-2); color:var(--chalk-dim); }
+
+  .scoreline { display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:10px; }
+  .team { display:flex; flex-direction:column; gap:2px; min-width:0; }
+  .team.away { text-align:right; align-items:flex-end; }
+  .team .name { font-weight:700; font-size:14px; word-break:keep-all; }
+  .team .flag { font-size:19px; line-height:1; }
+  .team.winner .name { color:var(--gold); }
+  .score {
+    font-family:var(--num); font-weight:700; font-size:27px; letter-spacing:.04em;
+    font-variant-numeric:tabular-nums; background:var(--card-2);
+    border:1px solid var(--chalk-faint); border-radius:8px; padding:4px 13px; white-space:nowrap;
+  }
+  .score.tbd { color:var(--chalk-dim); font-size:16px; padding:9px 13px; }
+  .match-no { font-family:var(--num); font-size:11px; color:var(--chalk-dim); letter-spacing:.08em; }
+
+  .stamp {
+    position:absolute; top:50%; right:12px; transform:translateY(-58%) rotate(-12deg);
+    font-family:var(--display); font-size:14px; letter-spacing:.08em;
+    padding:4px 9px; border:2.5px solid currentColor; border-radius:6px;
+    opacity:.9; pointer-events:none; mix-blend-mode:screen;
+  }
+  .stamp.hit, .stamp.exact { color:var(--gold); }
+  .stamp.exact { box-shadow:0 0 18px rgba(233,196,106,.25); }
+  .stamp.miss { color:var(--upset); }
+  .match.has-stamp .scoreline { padding-right:60px; }
+
+  /* 키플레이어 / 스페셜 */
+  .kp-list, .specials { display:flex; flex-direction:column; gap:9px; }
+  .kp-row, .sp-row { background:var(--card); border:1px solid var(--chalk-faint); border-radius:10px; padding:11px 13px; }
+  .kp-team { font-weight:700; font-size:13px; margin-bottom:7px; }
+  .kp-team .flag { margin-right:6px; }
+  .kp-chips { display:flex; flex-wrap:wrap; gap:6px; }
+  .kp-chip { background:var(--card-2); border:1px solid var(--chalk-faint); border-radius:999px; padding:5px 11px; font-size:13px; }
+  .kp-chip .note { color:var(--chalk-dim); font-size:11.5px; margin-left:4px; }
+  .kp-empty { font-size:12px; color:var(--chalk-dim); }
+  .sp-row { position:relative; display:flex; justify-content:space-between; align-items:center; overflow:hidden; }
+  .sp-label { font-size:13px; color:var(--chalk-dim); }
+  .sp-pick { font-weight:700; font-size:15px; }
+  .sp-row .stamp { position:static; transform:rotate(-8deg); font-size:12px; padding:2px 8px; margin-left:10px; }
+
+  /* 토너먼트 라운드 */
+  .round-tabs { display:flex; gap:6px; padding:12px 20px 0; overflow-x:auto; scrollbar-width:none; }
+  .round-tabs::-webkit-scrollbar { display:none; }
+
+  /* 수정 모드 */
+  .edit-grid { margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:6px; border-top:1px dashed var(--chalk-faint); padding-top:10px; }
+  .edit-grid label { display:flex; flex-direction:column; gap:3px; font-size:10.5px; color:var(--chalk-dim); }
+  .edit-grid input, .edit-grid select, .ed-inline {
+    font-family:var(--body); font-size:13px; color:var(--chalk);
+    background:var(--card-2); border:1px solid var(--chalk-faint); border-radius:6px; padding:7px 8px; width:100%;
+  }
+  .edit-grid input:focus, .edit-grid select:focus, .ed-inline:focus { outline:1px solid var(--gold); }
+  .edit-grid .full { grid-column:1 / -1; }
+
+  .savebar {
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:520px; z-index:50;
+    display:none; gap:10px; padding:12px 20px calc(12px + env(safe-area-inset-bottom));
+    background:linear-gradient(transparent, var(--pitch) 30%);
+  }
+  body.editing .savebar { display:flex; }
+  .savebar .btn { flex:1; padding:13px 0; font-size:14px; border-radius:10px; }
+  .save-status { position:fixed; bottom:84px; left:50%; transform:translateX(-50%); background:var(--card-2); border:1px solid var(--gold); color:var(--gold); font-size:12.5px; padding:8px 16px; border-radius:999px; z-index:51; display:none; }
+
+  .empty { text-align:center; color:var(--chalk-dim); font-size:13px; padding:36px 0; }
+  footer { margin-top:40px; padding:0 20px; font-size:11px; color:var(--chalk-dim); text-align:center; line-height:1.6; }
+
+  @media (prefers-reduced-motion:no-preference) {
+    section { animation:rise .3s ease both; }
+    @keyframes rise { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-top">
+    <div>
+      <p class="eyebrow">World Cup 2026 · Prediction Log</p>
+      <h1 id="site-title">2026 월드컵 예측</h1>
+      <p class="owner-line" id="owner-line"></p>
+    </div>
+    <div class="auth">
+      <button class="btn" id="btn-login" hidden>구글 로그인</button>
+      <button class="btn" id="btn-logout" hidden>로그아웃</button>
+      <div class="auth-user" id="auth-user"></div>
+      <button class="btn gold" id="btn-edit" hidden style="margin-top:6px">✏️ 수정 모드</button>
+    </div>
+  </div>
+  <div class="scoreboard" id="scoreboard"></div>
+</header>
+
+<div class="banner" id="banner"></div>
+
+<div class="stage-tabs" role="tablist">
+  <button class="stage-tab" id="tab-groups" aria-pressed="true">조별리그</button>
+  <button class="stage-tab" id="tab-bracket" aria-pressed="false">토너먼트</button>
+</div>
+
+<nav class="groups" id="sub-nav" aria-label="조/라운드 선택"></nav>
+
+<main id="content"></main>
+
+<footer id="site-foot"></footer>
+
+<div class="savebar">
+  <button class="btn danger" id="btn-cancel">취소</button>
+  <button class="btn gold" id="btn-save">💾 저장</button>
+</div>
+<div class="save-status" id="save-status"></div>
+
+<!-- Firebase (compat SDK) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="firebase-config.js"></script>
+<script src="seed-data.js"></script>
+<script>
+(function () {
+  /* ───────── 상태 ───────── */
+  let state = buildSeedState();   // 현재 화면 데이터
+  let backup = null;              // 수정 취소용
+  let stage = "groups";           // groups | bracket
+  let curGroup = "A";
+  let curRound = "r32";
+  let editing = false;
+  let user = null;
+
+  const $ = (id) => document.getElementById(id);
+  const $content = $("content");
+  const $nav = $("sub-nav");
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;" }[c]));
+
+  const firebaseReady = typeof FIREBASE_CONFIG !== "undefined" && FIREBASE_CONFIG.apiKey && FIREBASE_CONFIG.apiKey !== "YOUR_API_KEY";
+  let db = null, auth = null;
+  const DOC = () => db.collection("app").doc("worldcup");
+  const isAdmin = () => !!user && ADMIN_EMAILS.includes(user.email);
+
+  /* ───────── 판정 로직 ───────── */
+  function parseScore(s) {
+    if (!s) return null;
+    const m = String(s).split(":").map((v) => parseInt(v.trim(), 10));
+    return m.length === 2 && !m.some(isNaN) ? m : null;
+  }
+  function winnerOf(arr, home, away) {
+    if (!arr) return null;
+    return arr[0] > arr[1] ? home : arr[0] < arr[1] ? away : "무";
+  }
+  // "exact" | "hit" | "miss" | null
+  function judge(m) {
+    const a = parseScore(m.actual);
+    const realWinner = m.winner || winnerOf(a, m.home || m.team1, m.away || m.team2);
+    if (!m.pick || !realWinner) return null;
+    const p = parseScore(m.pickScore);
+    if (p && a && p[0] === a[0] && p[1] === a[1]) return "exact";
+    return m.pick === realWinner ? "hit" : "miss";
+  }
+  const stampText = { exact: "퍼펙트", hit: "적중", miss: "빗나감" };
+  const stampHtml = (j) => (j ? `<span class="stamp ${j}">${stampText[j]}</span>` : "");
+
+  function allMatches() {
+    const out = [];
+    Object.values(state.groups).forEach((g) => out.push(...g.matches));
+    Object.values(state.bracket).forEach((arr) => out.push(...arr));
+    return out;
+  }
+
+  /* ───────── 전광판 ───────── */
+  function renderScoreboard() {
+    let judged = 0, hits = 0, exacts = 0;
+    allMatches().forEach((m) => {
+      const j = judge(m);
+      if (j) { judged++; if (j !== "miss") hits++; if (j === "exact") exacts++; }
+    });
+    const rate = judged ? Math.round((hits / judged) * 100) : null;
+    $("scoreboard").innerHTML = `
+      <div class="sb-cell"><div class="sb-num">${judged}</div><div class="sb-label">판정 완료</div></div>
+      <div class="sb-cell"><div class="sb-num gold">${rate === null ? "—" : rate + "%"}</div><div class="sb-label">승부 적중률</div></div>
+      <div class="sb-cell"><div class="sb-num gold">${exacts}</div><div class="sb-label">스코어 퍼펙트</div></div>`;
+  }
+
+  /* ───────── 네비게이션 ───────── */
+  function renderNav() {
+    $("tab-groups").setAttribute("aria-pressed", String(stage === "groups"));
+    $("tab-bracket").setAttribute("aria-pressed", String(stage === "bracket"));
+    $nav.innerHTML = "";
+    const items = stage === "groups"
+      ? Object.keys(state.groups).map((k) => ({ id: k, label: k + "조", on: k === curGroup }))
+      : SEED_ROUNDS.map((r) => ({ id: r.key, label: r.name, on: r.key === curRound }));
+    items.forEach((it) => {
+      const b = document.createElement("button");
+      b.className = "chip";
+      b.textContent = it.label;
+      b.setAttribute("aria-pressed", String(it.on));
+      b.onclick = () => {
+        if (stage === "groups") curGroup = it.id; else curRound = it.id;
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      };
+      $nav.appendChild(b);
+    });
+  }
+
+  /* ───────── 공통 부품 ───────── */
+  function flagOf(g, team) { return (g.teams && g.teams[team]) || ""; }
+
+  function matchCard(m, opts) {
+    const { home, away, flagH, flagA, no, base } = opts;
+    const a = parseScore(m.actual);
+    const j = judge(m);
+    const realWinner = m.winner || winnerOf(a, home, away);
+    const badges =
+      (m.betType ? `<span class="badge ${m.betType === "역배" ? "upset" : "fav"}">${esc(m.betType)}</span>` : "") +
+      (m.pick ? `<span class="badge pick">픽 · ${esc(m.pick)}${m.pickScore ? " " + esc(m.pickScore) : ""}</span>` : `<span class="badge no">픽 없음</span>`);
+    const scoreHtml = a
+      ? `<span class="score">${a[0]}<span style="opacity:.45"> : </span>${a[1]}</span>`
+      : `<span class="score tbd">VS</span>`;
+    const teamHtml = (name, flag, side) => `
+      <div class="team ${side} ${realWinner && realWinner === name ? "winner" : ""}">
+        <span class="flag">${flag || "⚽"}</span><span class="name">${esc(name || "미정")}</span>
+      </div>`;
+    let editHtml = "";
+    if (editing) {
+      const teamOpts = (sel) =>
+        `<option value="" ${!sel ? "selected" : ""}>없음</option>` +
+        [home, "무", away].filter(Boolean).map((t) => `<option value="${esc(t)}" ${sel === t ? "selected" : ""}>${esc(t)}</option>`).join("");
+      const isBracket = base.includes("bracket");
+      editHtml = `<div class="edit-grid">
+        ${isBracket ? `
+          <label class="full">대진 설명 (예: 1A vs 3위)<input data-bind="${base}.label" value="${esc(m.label)}"></label>
+          <label>팀1 (국기+이름)<input data-bind="${base}.team1" value="${esc(m.team1)}" placeholder="🇰🇷 한국"></label>
+          <label>팀2<input data-bind="${base}.team2" value="${esc(m.team2)}" placeholder="🇧🇷 브라질"></label>
+          <label>승리 픽<input data-bind="${base}.pick" value="${esc(m.pick)}" placeholder="팀 이름"></label>
+          <label>실제 승자 (승부차기 시)<input data-bind="${base}.winner" value="${esc(m.winner)}" placeholder="비워두면 스코어로 판정"></label>
+        ` : `
+          <label>승리 픽<select data-bind="${base}.pick">${teamOpts(m.pick)}</select></label>
+          <label>정배/역배<select data-bind="${base}.betType">
+            <option value="" ${!m.betType ? "selected" : ""}>없음</option>
+            <option ${m.betType === "정배" ? "selected" : ""}>정배</option>
+            <option ${m.betType === "역배" ? "selected" : ""}>역배</option>
+          </select></label>
+        `}
+        <label>스코어 픽 (예: 2:1)<input data-bind="${base}.pickScore" value="${esc(m.pickScore)}" inputmode="numeric"></label>
+        <label>실제 결과 (예: 1:3)<input data-bind="${base}.actual" value="${esc(m.actual)}" inputmode="numeric"></label>
+        ${isBracket ? `<label>정배/역배<select data-bind="${base}.betType">
+            <option value="" ${!m.betType ? "selected" : ""}>없음</option>
+            <option ${m.betType === "정배" ? "selected" : ""}>정배</option>
+            <option ${m.betType === "역배" ? "selected" : ""}>역배</option>
+          </select></label>` : ""}
+      </div>`;
+    }
+    return `<article class="match ${j && !editing ? "has-stamp" : ""}">
+      <div class="match-top"><div class="badges">${badges}</div>${no ? `<span class="match-no">${no}</span>` : ""}</div>
+      <div class="scoreline">${teamHtml(home, flagH, "home")}${scoreHtml}${teamHtml(away, flagA, "away")}</div>
+      ${m.label && !editing ? `<div class="match-no" style="margin-top:8px">${esc(m.label)}</div>` : ""}
+      ${editing ? "" : stampHtml(j)}
+      ${editHtml}
+    </article>`;
+  }
+
+  /* ───────── 조별리그 뷰 ───────── */
+  function renderGroupView() {
+    const g = state.groups[curGroup];
+    if (!g) { $content.innerHTML = '<p class="empty">데이터 없음</p>'; return; }
+    const base = `groups.${curGroup}`;
+    const teamNames = Object.keys(g.teams);
+    let html = "";
+
+    // 순위
+    html += `<section><div class="sec-head"><h2 class="sec-title">조 순위 픽</h2><span class="sec-sub">${curGroup}조 최종 순위 예측</span></div><div class="standings">`;
+    html += g.standings.map((s, i) => {
+      if (editing) {
+        const opts = teamNames.map((t) => `<option ${s.team === t ? "selected" : ""}>${esc(t)}</option>`).join("");
+        return `<div class="stand-row ${i < 2 ? "q" : i === 2 ? "q3" : ""}">
+          <span class="rank">${i + 1}</span>
+          <select class="ed-inline" data-bind="${base}.standings.${i}.team">${opts}</select>
+          <input class="ed-inline" style="width:90px" data-bind="${base}.standings.${i}.record" value="${esc(s.record)}" placeholder="2승 1패">
+        </div>`;
+      }
+      return `<div class="stand-row ${i < 2 ? "q" : i === 2 ? "q3" : ""}">
+        <span class="rank">${i + 1}</span>
+        <span class="stand-team"><span class="flag">${flagOf(g, s.team)}</span>${esc(s.team)}</span>
+        <span class="stand-rec">${esc(s.record)}</span>
+      </div>`;
+    }).join("");
+    html += `</div><p class="stand-note"><i></i>1·2위 32강 직행 <i class="half" style="margin-left:10px"></i>3위는 베스트 8팀 안에 들면 진출</p></section>`;
+
+    // 경기
+    html += `<section><div class="sec-head"><h2 class="sec-title">승부 · 스코어</h2><span class="sec-sub">조별 6경기 픽과 결과</span></div><div class="matches">`;
+    html += g.matches.map((m, i) =>
+      matchCard(m, { home: m.home, away: m.away, flagH: flagOf(g, m.home), flagA: flagOf(g, m.away), no: "", base: `${base}.matches.${i}` })
+    ).join("");
+    html += `</div></section>`;
+
+    // 키플레이어
+    html += `<section><div class="sec-head"><h2 class="sec-title">키플레이어</h2><span class="sec-sub">월클 말고, 숨은 보석 픽</span></div><div class="kp-list">`;
+    html += g.keyPlayers.map((kp, i) => {
+      const chips = kp.players.length
+        ? kp.players.map((p) => `<span class="kp-chip">${esc(p.name)}${p.note ? `<span class="note">${esc(p.note)}</span>` : ""}</span>`).join("")
+        : `<span class="kp-empty">아직 픽 없음</span>`;
+      const editRow = editing
+        ? `<input class="ed-inline" style="margin-top:8px" data-kp="${base}.keyPlayers.${i}"
+             value="${esc(kp.players.map((p) => p.note ? `${p.name}(${p.note})` : p.name).join(", "))}"
+             placeholder="이름(메모), 이름 — 쉼표로 구분">`
+        : "";
+      return `<div class="kp-row"><div class="kp-team"><span class="flag">${flagOf(g, kp.team)}</span>${esc(kp.team)}</div><div class="kp-chips">${chips}</div>${editRow}</div>`;
+    }).join("");
+    html += `</div></section>`;
+
+    // 스페셜
+    html += renderSpecials(g.specials, `${base}.specials`, "스페셜 픽", "첫 골 · 자유 예측");
+    $content.innerHTML = html;
+  }
+
+  function renderSpecials(list, base, title, sub) {
+    let html = `<section><div class="sec-head"><h2 class="sec-title">${title}</h2><span class="sec-sub">${sub}</span></div><div class="specials">`;
+    html += list.map((sp, i) => {
+      if (editing) {
+        return `<div class="sp-row" style="gap:6px">
+          <input class="ed-inline" data-bind="${base}.${i}.label" value="${esc(sp.label)}" placeholder="항목">
+          <input class="ed-inline" data-bind="${base}.${i}.pick" value="${esc(sp.pick)}" placeholder="픽">
+          <input class="ed-inline" data-bind="${base}.${i}.actual" value="${esc(sp.actual)}" placeholder="실제 결과">
+          <button class="btn danger" data-del="${base}.${i}">✕</button>
+        </div>`;
+      }
+      let st = "";
+      if (sp.actual) st = sp.actual === sp.pick ? `<span class="stamp hit">적중</span>` : `<span class="stamp miss">빗나감</span>`;
+      return `<div class="sp-row"><span class="sp-label">${esc(sp.label)}</span>
+        <span style="display:flex;align-items:center"><span class="sp-pick">${esc(sp.pick) || "—"}</span>${st}</span></div>`;
+    }).join("");
+    if (editing) html += `<button class="btn" data-add="${base}">+ 항목 추가</button>`;
+    html += `</div></section>`;
+    return html;
+  }
+
+  /* ───────── 토너먼트 뷰 ───────── */
+  function renderBracketView() {
+    const round = SEED_ROUNDS.find((r) => r.key === curRound);
+    const arr = state.bracket[curRound] || [];
+    let html = `<section><div class="sec-head"><h2 class="sec-title">${round.name}</h2><span class="sec-sub">매치 ${round.start}–${round.start + round.count - 1} · 팀 확정 시 입력</span></div><div class="matches">`;
+    html += arr.map((m, i) =>
+      matchCard(m, {
+        home: m.team1.replace(/^[^\uAC00-\uD7A3A-Za-z]*\s*/, "") || m.team1, away: m.team2.replace(/^[^\uAC00-\uD7A3A-Za-z]*\s*/, "") || m.team2,
+        flagH: (m.team1.match(/^\S+/) || [""])[0].match(/[\u{1F1E6}-\u{1F1FF}\u{1F3F4}]/u) ? m.team1.split(" ")[0] : "",
+        flagA: (m.team2.match(/^\S+/) || [""])[0].match(/[\u{1F1E6}-\u{1F1FF}\u{1F3F4}]/u) ? m.team2.split(" ")[0] : "",
+        no: "M" + m.no, base: `bracket.${curRound}.${i}`,
+      })
+    ).join("");
+    html += `</div></section>`;
+    if (curRound === "final") {
+      html += renderSpecials(state.bracketSpecials, "bracketSpecials", "대회 스페셜 픽", "우승 · 득점왕 · 골든볼");
+    }
+    $content.innerHTML = html;
+  }
+
+  /* ───────── 렌더 & 입력 바인딩 ───────── */
+  function render() {
+    renderScoreboard();
+    renderNav();
+    if (stage === "groups") renderGroupView(); else renderBracketView();
+    $("site-title").textContent = state.site.title;
+    $("owner-line").innerHTML = "<b>" + esc(state.site.owner) + "</b>의 " + esc(state.site.subtitle);
+    $("site-foot").innerHTML = "마지막 업데이트 " + esc(state.updated || "") +
+      (firebaseReady ? "" : "<br>※ 미리보기 모드 — Firebase 설정 후 로그인 편집 가능");
+  }
+
+  function deepSet(path, value) {
+    const keys = path.split(".");
+    let o = state;
+    for (let i = 0; i < keys.length - 1; i++) o = o[keys[i]];
+    o[keys[keys.length - 1]] = value;
+  }
+  function deepGet(path) {
+    return path.split(".").reduce((o, k) => o[k], state);
+  }
+
+  $content.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.bind) {
+      deepSet(t.dataset.bind, t.value.trim());
+      renderScoreboard();
+    } else if (t.dataset.kp) {
+      // "이름(메모), 이름" → players 배열
+      const players = t.value.split(",").map((s) => s.trim()).filter(Boolean).map((s) => {
+        const m = s.match(/^(.+?)\((.+)\)$/);
+        return m ? { name: m[1].trim(), note: m[2].trim() } : { name: s };
+      });
+      deepGet(t.dataset.kp).players = players;
+    }
+  });
+  $content.addEventListener("click", (e) => {
+    const t = e.target.closest("[data-add],[data-del]");
+    if (!t) return;
+    if (t.dataset.add) {
+      deepGet(t.dataset.add).push({ label: "", pick: "", actual: "" });
+      render();
+    } else if (t.dataset.del) {
+      const keys = t.dataset.del.split(".");
+      const idx = +keys.pop();
+      deepGet(keys.join(".")).splice(idx, 1);
+      render();
+    }
+  });
+
+  $("tab-groups").onclick = () => { stage = "groups"; render(); };
+  $("tab-bracket").onclick = () => { stage = "bracket"; render(); };
+
+  /* ───────── 수정 모드 / 저장 ───────── */
+  function setEditing(on) {
+    editing = on;
+    document.body.classList.toggle("editing", on);
+    $("btn-edit").hidden = on || !isAdmin();
+    render();
+  }
+  $("btn-edit").onclick = () => { backup = JSON.stringify(state); setEditing(true); };
+  $("btn-cancel").onclick = () => { if (backup) state = JSON.parse(backup); setEditing(false); };
+  $("btn-save").onclick = async () => {
+    state.updated = new Date().toISOString().slice(0, 10);
+    try {
+      await DOC().set({ json: JSON.stringify(state), updated: state.updated });
+      toast("저장 완료 ✅");
+      setEditing(false);
+    } catch (err) {
+      toast("저장 실패: " + err.message);
+    }
+  };
+  let toastTimer;
+  function toast(msg) {
+    const el = $("save-status");
+    el.textContent = msg;
+    el.style.display = "block";
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => (el.style.display = "none"), 2500);
+  }
+
+  /* ───────── Firebase 초기화 ───────── */
+  async function initFirebase() {
+    const banner = $("banner");
+    if (!firebaseReady) {
+      banner.textContent = "⚙️ 아직 Firebase가 연결되지 않아 미리 입력된 데이터만 보여요. firebase-config.js를 채우면 구글 로그인 후 사이트에서 직접 입력/수정할 수 있습니다. (README 참고)";
+      return;
+    }
+    banner.classList.add("hidden");
+    firebase.initializeApp(FIREBASE_CONFIG);
+    auth = firebase.auth();
+    db = firebase.firestore();
+
+    // 데이터 로드 (DB 비어 있으면 seed 유지)
+    try {
+      const snap = await DOC().get();
+      if (snap.exists && snap.data().json) {
+        state = JSON.parse(snap.data().json);
+        render();
+      }
+    } catch (e) { console.warn("load fail", e); }
+
+    $("btn-login").hidden = false;
+    $("btn-login").onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()).catch((e) => toast(e.message));
+    $("btn-logout").onclick = () => auth.signOut();
+
+    auth.onAuthStateChanged(async (u) => {
+      user = u;
+      $("btn-login").hidden = !!u;
+      $("btn-logout").hidden = !u;
+      $("auth-user").textContent = u ? u.email + (isAdmin() ? " (관리자)" : " (보기 전용)") : "";
+      $("btn-edit").hidden = !isAdmin();
+      // 관리자 최초 진입 & DB 비어있으면 시드 업로드 제안
+      if (isAdmin()) {
+        const snap = await DOC().get().catch(() => null);
+        if (!snap || !snap.exists) {
+          if (confirm("DB가 비어 있어요. 미리 입력된 시드 데이터(12개 조 + A조 픽)를 업로드할까요?")) {
+            await DOC().set({ json: JSON.stringify(state), updated: state.updated });
+            toast("초기 데이터 업로드 완료 ✅");
+          }
+        }
+      }
+    });
+  }
+
+  render();
+  initFirebase();
+})();
+</script>
+</body>
+</html>
