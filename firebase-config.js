@@ -5,12 +5,13 @@
    ============================================================ */
 
 const FIREBASE_CONFIG = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+    apiKey: "AIzaSyCsONyA6-yf6gTeN1QEfERfucHzeku3o80",
+  authDomain: "soccer-40478.firebaseapp.com",
+  projectId: "soccer-40478",
+  storageBucket: "soccer-40478.firebasestorage.app",
+  messagingSenderId: "649217857843",
+  appId: "1:649217857843:web:b0b4e172a1d4fd6cf30646",
+  measurementId: "G-7PB8HZH3JQ"
 };
 
 /* 수정 권한을 가질 구글 계정 이메일 (본인 지메일로 교체)
