@@ -16,4 +16,4 @@ const FIREBASE_CONFIG = {
 
 /* 수정 권한을 가질 구글 계정 이메일 (본인 지메일로 교체)
    ※ 실제 차단은 Firestore 보안 규칙이 담당. 여기는 UI 표시용. */
-const ADMIN_EMAILS = ["your-email@gmail.com"];
+const ADMIN_EMAILS = ["msk7240@hanmail.net"];
