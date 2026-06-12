@@ -339,7 +339,7 @@
     let editHtml = "";
     if (editing) {
       const teamOpts = (sel) =>
-        `<option value="" ${!sel ? "selected" : ""}>없음</option>` +
+        `<option value="" ${!sel ? "selected" : ""}>엄대엄</option>` +
         [home, "무", away].filter(Boolean).map((t) => `<option value="${esc(t)}" ${sel === t ? "selected" : ""}>${esc(t)}</option>`).join("");
       const isBracket = base.includes("bracket");
       editHtml = `<div class="edit-grid">
